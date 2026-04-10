@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Office Directory</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="container">
+  <h1>48 VILLAGE CENTRE PLACE</h1>
+  <p>Office Directory</p>
+
+  <div id="clock"></div>
+  <div id="weather">Loading weather...</div>
+
+  <div id="directory"></div>
+</div>
+
+<script src="data.js"></script>
+<script>
+function loadDirectory() {
+  const container = document.getElementById("directory");
+
+  directoryData.forEach(suite => {
+    const suiteDiv = document.createElement("div");
+    suiteDiv.className = "suite";
+
+    const title = document.createElement("h2");
+    title.textContent = suite.suiteName;
+    suiteDiv.appendChild(title);
+
+    suite.entries.forEach(entry => {
+      const entryDiv = document.createElement("div");
+      entryDiv.className = "entry";
+      entryDiv.textContent = entry.name;
+      suiteDiv.appendChild(entryDiv);
+    });
+
+    container.appendChild(suiteDiv);
+  });
+}
+
+function updateClock() {
+  const now = new Date();
+  document.getElementById("clock").innerText =
+    now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+async function loadWeather() {
+  try {
+    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${weatherConfig.latitude}&longitude=${weatherConfig.longitude}&current_weather=true`);
+    const data = await res.json();
+
+    document.getElementById("weather").innerText =
+      `${weatherConfig.cityLabel}: ${data.current_weather.temperature}°C`;
+  } catch {
+    document.getElementById("weather").innerText = "Weather unavailable";
+  }
+}
+
+loadDirectory();
+loadWeather();
+</script>
+
+</body>
+</html>
